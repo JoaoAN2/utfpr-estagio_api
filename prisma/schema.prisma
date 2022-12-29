@@ -1,0 +1,147 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Curso {
+  id    Int     @id @default(autoincrement())
+  name  String
+  Aluno Aluno[]
+  Prae  Prae[]
+
+  @@map("curso")
+}
+
+model Feriado {
+  id    Int      @id @default(autoincrement())
+  data  DateTime
+  anual Boolean
+  desc  String
+
+  @@map("feriado")
+}
+
+model Uce {
+  id         Int          @id @default(autoincrement())
+  cnpj       String
+  cep        String
+  logradouro String
+  bairro     String
+  Supervisor Supervisor[]
+
+  @@map("uce")
+}
+
+model Usuario {
+  id       String  @id @default(uuid())
+  email    String
+  senha    String?
+  nome     String
+  telefone String
+  foto     String?
+
+  Aluno      Aluno[]
+  Prae       Prae[]
+  Supervisor Supervisor[]
+  Orientador Orientador[]
+
+  @@map("usuario")
+}
+
+model Aluno {
+  usuario            Usuario   @relation(fields: [usuario_id], references: [id])
+  usuario_id         String    @id
+  ra                 String
+  periodo            Int
+  curso              Curso     @relation(fields: [curso_id], references: [id])
+  curso_id           Int
+  minutos_totais     Int?
+  minutos_restantes  Int?
+  minutos_concluidos Int?
+  Estagio            Estagio[]
+
+  @@map("aluno")
+}
+
+model Prae {
+  usuario    Usuario   @relation(fields: [usuario_id], references: [id])
+  usuario_id String    @id
+  curso      Curso     @relation(fields: [curso_id], references: [id])
+  curso_id   Int
+  Estagio    Estagio[]
+
+  @@map("prae")
+}
+
+model Supervisor {
+  usuario    Usuario   @relation(fields: [usuario_id], references: [id])
+  usuario_id String    @id
+  cargo      String
+  setor      String
+  uce        Uce       @relation(fields: [uce_id], references: [id])
+  uce_id     Int
+  Estagio    Estagio[]
+
+  @@map("supervisor")
+}
+
+model Orientador {
+  usuario      Usuario   @relation(fields: [usuario_id], references: [id])
+  usuario_id   String    @id
+  departamento String
+  Estagio      Estagio[]
+
+  @@map("orientador")
+}
+
+model Estagio {
+  id Int @id @default(autoincrement())
+
+  aluno    Aluno  @relation(fields: [aluno_id], references: [usuario_id])
+  aluno_id String
+
+  prae    Prae   @relation(fields: [prae_id], references: [usuario_id])
+  prae_id String
+
+  orientador    Orientador @relation(fields: [orientador_id], references: [usuario_id])
+  orientador_id String
+
+  supervisor    Supervisor @relation(fields: [supervisor_id], references: [usuario_id])
+  supervisor_id String
+
+  minuto_semanal Int
+  minuto_total   Int
+  data_inicio    DateTime
+  data_final     DateTime
+  DatasEstagio   DatasEstagio[]
+  Jornada        Jornada[]
+
+  @@map("estagio")
+}
+
+model DatasEstagio {
+  id              Int      @id @default(autoincrement())
+  data            DateTime
+  estagio         Estagio  @relation(fields: [estagio_id], references: [id])
+  estagio_id      Int
+  tempo_concluido Int
+
+  @@map("datas_estagio")
+}
+
+model Jornada {
+  estagio       Estagio @relation(fields: [estagio_id], references: [id])
+  estagio_id    Int
+  dia_da_semana Int
+  tempo_jornada Int
+
+  @@id([estagio_id, dia_da_semana])
+  @@map("jornada")
+}
