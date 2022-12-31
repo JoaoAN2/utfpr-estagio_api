@@ -14,7 +14,7 @@ class UserController {
             const token = await service.execute({email, senha, nome, telefone, foto});
             return response.json(token);
         } catch (err) {
-            console.log({erro: err.message})
+            return response.json({erro: err.message})
         }
     }
 
