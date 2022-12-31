@@ -19,6 +19,7 @@ routes.delete("/user", ensureAuthenticated, userController.delete);
 
 // Aluno
 routes.post("/student", ensureAuthenticated, studentController.create);
+routes.get("/student", studentController.read);
 
 // Curso
 routes.post("/course", courseController.create);

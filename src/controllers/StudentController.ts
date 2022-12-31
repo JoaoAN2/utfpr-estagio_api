@@ -1,6 +1,7 @@
 import { Aluno } from "@prisma/client";
 import { Request, Response } from "express";
 import { CreateStudentService } from "../services/CreateStudentService";
+import { GetStudentService } from "../services/GetStudentService";
 
 export class StudentController {
     async create(request: Request, response: Response) {
@@ -20,5 +21,14 @@ export class StudentController {
         return response.json(createdStudent);
     }
 
-    
+    async read(request: Request, response: Response) {
+        try {
+            const id = String(request.query.id);
+            const getStudentService = new GetStudentService();
+            const student = await getStudentService.execute(id);
+            return response.json(student);
+        } catch (error) {
+            return response.json({erro: error.message})
+        }
+    }
 }

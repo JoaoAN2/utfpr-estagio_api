@@ -9,8 +9,12 @@ export class CourseController {
     async create(request: Request, response: Response) {
         const { nome } = request.body;
         const createCourseService = new CreateCourseService();
-        const createdCourse = await createCourseService.execute(nome);
-        return response.json(createdCourse);
+        try {
+            const createdCourse = await createCourseService.execute(nome);
+            return response.json(createdCourse);
+        } catch (error) {
+            return response.json({erro: error.message});
+        }
     }
 
     async read(request: Request, response: Response) {
@@ -44,7 +48,11 @@ export class CourseController {
     async delete(request: Request, response: Response) {
         const { id } = request.body;
         const deleteCourseService = new DeleteCourseService();
-        const deletedCourse = await deleteCourseService.execute(id);
-        return response.json(deletedCourse);
+        try {
+            const deletedCourse = await deleteCourseService.execute(id);
+            return response.json(deletedCourse);
+        } catch (error) {
+            return response.json({erro: error.message})
+        }
     }
 }
